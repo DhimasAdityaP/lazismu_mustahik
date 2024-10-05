@@ -4,7 +4,7 @@ import bgImage from './bg.png';
 
 const App = () => {
     const [formData, setFormData] = useState({
-        total_score:0,
+
         tanggal_survey: '',
         petugas_survey: '',
         nama_mustahik: '',
