@@ -390,8 +390,9 @@ const handleSubmit = async (e) => {
     };
     return (
         <div className="app-container">
-            <img src={bgImage} alt="Descriptive Alt Text" className="header-image" />
-            {/* Form di sini */}
+        <img src={bgImage} alt="Descriptive Alt Text" className="header-image" />
+        {/* Judul Form */}
+        <h1 className="form-title">Form Survey Mustahik</h1>
             <form onSubmit={handleSubmit}>
                 <label>Tanggal Survey:</label>
                 <input type="date" name="tanggal_survey" onChange={handleChange} required />

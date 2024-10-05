@@ -1,5 +1,4 @@
 /* Reset default margin and padding */
-
 * {
   margin: 0;
   padding: 0;
@@ -8,7 +7,6 @@
 
 /* Styling untuk body agar lebih menarik */
 body {
-  margin: 0;
   font-family: 'Poppins', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   background-color: #f4f7fc; /* Warna latar belakang yang lembut */
   color: #333; /* Warna teks yang lebih gelap untuk keterbacaan */
@@ -105,4 +103,104 @@ footer {
 /* Animasi smooth scroll */
 html {
   scroll-behavior: smooth;
+}
+
+/* App-specific styles */
+
+/* Container utama aplikasi */
+.app-container {
+  background-image: url('./bg.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Gambar header */
+.header-image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+/* Judul form */
+.form-title {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Form survey */
+.survey-form {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Grup form */
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Input spesifik dalam grup form */
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+/* Grup radio buttons */
+.radio-group {
+  display: flex;
+  gap: 20px;
+}
+
+.radio-group label {
+  font-weight: normal;
+}
+
+/* Tombol submit */
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #218838;
+}
+
+/* Responsif untuk perangkat mobile */
+@media (max-width: 600px) {
+  .survey-form {
+    padding: 20px;
+  }
+
+  .radio-group {
+    flex-direction: column;
+  }
 }
