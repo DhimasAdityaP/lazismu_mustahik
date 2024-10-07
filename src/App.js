@@ -398,7 +398,6 @@ const handleSubmit = async (e) => {
                 <label>Tanggal Survey:</label>
                 <input type="date" name="tanggal_survey" onChange={handleChange} required />
             <label>Petugas Survey:</label>
-            <label>Petugas Survey:</label>
                 <input
                     type="text"
                     name="petugas_survey"
