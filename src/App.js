@@ -673,7 +673,7 @@ const handleSubmit = async (e) => {
                 <option value="Sepeda">Sepeda</option>
             </select>
 
-            <label>Status Bantuan:</label>
+            <label>Menerima Bantuan:</label>
         <select name="status_bantuan" onChange={handleChange} required>
             <option value="">Pilih status bantuan</option>
             <option value="1">Ya </option>
