@@ -368,7 +368,6 @@ const handleSubmit = async (e) => {
         alert(`Please fill out the following fields: ${emptyFields.join(', ')}`);
         return;
     }
-    
         calculateTotalScore();
         
         setTimeout(async () => {
@@ -396,15 +395,10 @@ const handleSubmit = async (e) => {
         {/* Judul Form */}
         <h1 className="form-title">Form Survey Mustahik</h1>
             <form onSubmit={handleSubmit}>
-            <label>Tanggal Survey:</label>
-                <input
-                    type="date"
-                    name="tanggal_survey"
-                    value={formData.tanggal_survey}
-                    readOnly // This makes the field unchangeable
-                    required
-                />
-                <label>Petugas Survey:</label>
+                <label>Tanggal Survey:</label>
+                <input type="date" name="tanggal_survey" onChange={handleChange} required />
+            <label>Petugas Survey:</label>
+            <label>Petugas Survey:</label>
                 <input
                     type="text"
                     name="petugas_survey"
@@ -412,7 +406,6 @@ const handleSubmit = async (e) => {
                     readOnly // This makes the field unchangeable
                     required
                 />
-
             <label>Nama Mustahik:</label>
             <input type="text" name="nama_mustahik" onChange={handleChange} required />
 
