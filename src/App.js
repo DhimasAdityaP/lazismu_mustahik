@@ -128,6 +128,7 @@ const App = () => {
             case 'biaya pendidikan': totalScore += 3; break;
             case 'kebutuhan sosial': totalScore += 2; break;
             case 'kebutuhan sekunder': totalScore += 1; break;
+            case 'tidak ada': totalScore += 1; break;
             default: break;
         }
 
@@ -477,6 +478,7 @@ const handleSubmit = async (e) => {
                 <option value="biaya pendidikan">Biaya Pendidikan</option>
                 <option value="kebutuhan sosial">Kebutuhan Sosial</option>
                 <option value="kebutuhan sekunder">Kebutuhan Sekunder</option>
+                <option value="Tidak Ada">Tidak Ada</option>
             </select>
 
             <label>Pekerjaan Kepala Keluarga:</label>
