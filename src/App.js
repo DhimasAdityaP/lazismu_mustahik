@@ -1,10 +1,9 @@
-import { useState } from 'react';
-import { supabase } from './supabaseClient';  // Pastikan supabase client sudah disiapkan\
+import React, { useState, useMemo } from 'react';
+import { supabase } from './supabaseClient'; // Pastikan Anda mengimpor supabase dengan benar
 import bgImage from './bg.png';
 
 const App = () => {
     const [formData, setFormData] = useState({
-
         tanggal_survey: '',
         petugas_survey: 'Admin',
         nama_mustahik: '',
@@ -15,7 +14,7 @@ const App = () => {
         pengeluaran_bulanan: 0,
         obat_rutin: 0,
         biaya_pendidikan: 0,
-        riwayat_hutang: '',
+        riwayat_hutang: false, // Ubah menjadi boolean
         keperluan_hutang: '',
         pekerjaan_kepala_keluarga: '',
         pekerjaan_suami_istri: '',
@@ -39,99 +38,101 @@ const App = () => {
         aset_tidak_bergerak: '',
         aset_bergerak: '',
         status_bantuan: '',
-        jenis_bantuan:'',
-        frekuensi_bantuan:'',
-        bantuan_yang_diterima:'',
-        rencana_tindak_lanjut:'',
+        jenis_bantuan: '',
+        frekuensi_bantuan: '',
+        bantuan_yang_diterima: '',
+        rencana_tindak_lanjut: '',
     });
 
     // Fungsi untuk menghitung total skor
     const calculateTotalScore = () => {
-        let totalScore = '';
-        
-        // Logika perhitungan skor
+        let totalScore = 0; // Inisialisasi sebagai angka
+
+        // 1. Jumlah Tanggungan
         if (formData.jumlah_tanggungan > 7) {
-            totalScore += 5; // Jika lebih dari 7, tambah 5 poin
+            totalScore += 5;
         } else if (formData.jumlah_tanggungan >= 4 && formData.jumlah_tanggungan <= 6) {
-            totalScore += 4; // Jika antara 4 dan 6, tambah 4 poin
+            totalScore += 4;
         } else if (formData.jumlah_tanggungan >= 2 && formData.jumlah_tanggungan <= 3) {
-            totalScore += 3; // Jika antara 2 dan 3, tambah 3 poin
-        } else if (formData.jumlah_tanggungan >= 1 && formData.jumlah_tanggungan <= 2) {
-            totalScore += 2; // Jika antara 1 dan 2, tambah 2 poin
+            totalScore += 3;
+        } else if (formData.jumlah_tanggungan === 1) {
+            totalScore += 2;
         } else {
-            totalScore += 1; // Jika tidak ada tanggungan, tambah 1 poin
+            totalScore += 1;
         }
 
+        // 2. Jumlah Anak Sekolah
         if (formData.jumlah_anak_sekolah === 4) {
-            totalScore += 5; // Jika jumlah anak sekolah adalah 4, tambah 5 poin
-        } else if (formData.jumlah_anak_sekolah >= 4 && formData.jumlah_anak_sekolah <= 6) {
-            totalScore += 4; // Jika antara 4 hingga 6, tambah 4 poin
+            totalScore += 5;
+        } else if (formData.jumlah_anak_sekolah >= 5 && formData.jumlah_anak_sekolah <= 6) {
+            totalScore += 4;
         } else if (formData.jumlah_anak_sekolah >= 2 && formData.jumlah_anak_sekolah <= 3) {
-            totalScore += 3; // Jika antara 2 dan 3, tambah 3 poin
-        } else if (formData.jumlah_anak_sekolah >= 1) {
-            totalScore += 2; // Jika antara 1 dan 2, tambah 2 poin
+            totalScore += 3;
+        } else if (formData.jumlah_anak_sekolah === 1) {
+            totalScore += 2;
         } else {
-            totalScore += 1; // Jika tidak ada anak sekolah, tambah 1 poin
+            totalScore += 1;
         }
-        
+
+        // 3. Jumlah Anak Putus Sekolah
         totalScore += formData.jumlah_anak_putus_sekolah > 0 ? 5 : 1;
 
+        // 4. Pengeluaran Bulanan
         if (formData.pengeluaran_bulanan > 3000000) {
-            totalScore += 1; // > 3 juta = 1 poin
+            totalScore += 1;
         } else if (formData.pengeluaran_bulanan > 2000000) {
-            totalScore += 2; // 2 juta - 3 juta = 2 poin
+            totalScore += 2;
         } else if (formData.pengeluaran_bulanan > 1000000) {
-            totalScore += 3; // 1 juta - 2 juta = 3 poin
+            totalScore += 3;
         } else if (formData.pengeluaran_bulanan > 500000) {
-            totalScore += 4; // 500 ribu - 1 juta = 4 poin
+            totalScore += 4;
         } else if (formData.pengeluaran_bulanan > 250000) {
-            totalScore += 5; // 250 ribu - 500 ribu = 5 poin
+            totalScore += 5;
         } else {
-            totalScore += 6; // <= 250 ribu = 6 poin (jika ingin menambahkan kategori ini)
+            totalScore += 6;
         }
-        
 
+        // 5. Obat Rutin
         if (formData.obat_rutin > 1000000) {
-            totalScore += 5; // > 1 juta = 5 poin
+            totalScore += 5;
         } else if (formData.obat_rutin >= 500000) {
-            totalScore += 4; // 500 ribu - 1 juta = 4 poin
+            totalScore += 4;
         } else if (formData.obat_rutin >= 300000) {
-            totalScore += 3; // 300 ribu - 500 ribu = 3 poin
+            totalScore += 3;
         } else if (formData.obat_rutin < 200000) {
-            totalScore += 2; // < 200 ribu = 2 poin
-        } 
-        // Tidak ada 1 poin jika tidak memenuhi syarat
-        
-
-        if (formData.biaya_pendidikan > 2000000) {
-            totalScore += 5; // > 2 juta = 5 poin
-        } else if (formData.biaya_pendidikan > 1500000) {
-            totalScore += 4; // 1,5 juta - 2 juta = 4 poin
-        } else if (formData.biaya_pendidikan > 1000000) {
-            totalScore += 1; // 1 juta - 1,5 juta = 1 poin
-        } else if (formData.biaya_pendidikan > 500000) {
-            totalScore += 3; // 500 ribu - 1 juta = 3 poin
-        } else if (formData.biaya_pendidikan > 250000) {
-            totalScore += 2; // 250 ribu - 500 ribu = 2 poin
-        } else {
-            totalScore += 1; // < 250 ribu = 1 poin
+            totalScore += 2;
         }
-        
 
-        // 7. Riwayat hutang
-        totalScore += formData.riwayat_hutang ? 5 : 1; // Assign 5 points if true, 1 point if false
+        // 6. Biaya Pendidikan
+        if (formData.biaya_pendidikan > 2000000) {
+            totalScore += 5;
+        } else if (formData.biaya_pendidikan > 1500000) {
+            totalScore += 4;
+        } else if (formData.biaya_pendidikan > 1000000) {
+            totalScore += 1;
+        } else if (formData.biaya_pendidikan > 500000) {
+            totalScore += 3;
+        } else if (formData.biaya_pendidikan > 250000) {
+            totalScore += 2;
+        } else {
+            totalScore += 1;
+        }
 
+        // 7. Riwayat Hutang
+        totalScore += formData.riwayat_hutang ? 5 : 1;
 
+        // 8. Keperluan Hutang
         switch (formData.keperluan_hutang) {
             case 'kebutuhan hidup': totalScore += 5; break;
             case 'biaya kesehatan': totalScore += 4; break;
             case 'biaya pendidikan': totalScore += 3; break;
             case 'kebutuhan sosial': totalScore += 2; break;
-            case 'kebutuhan sekunder': totalScore += 1; break;
+            case 'kebutuhan sekunder':
             case 'tidak ada': totalScore += 1; break;
             default: break;
         }
 
+        // 9. Pekerjaan Kepala Keluarga
         switch (formData.pekerjaan_kepala_keluarga) {
             case 'PNS': totalScore += 1; break;
             case 'dagang': totalScore += 2; break;
@@ -141,10 +142,11 @@ const App = () => {
             default: break;
         }
 
-        // Merokok
+        // 10. Merokok
+        // Asumsi `merokok` adalah boolean
         totalScore += formData.merokok ? 1 : 5;
 
-        // Pekerjaan Suami/Istri
+        // 11. Pekerjaan Suami/Istri
         switch (formData.pekerjaan_suami_istri) {
             case 'PNS': totalScore += 1; break;
             case 'dagang': totalScore += 2; break;
@@ -154,14 +156,20 @@ const App = () => {
             default: break;
         }
 
-        // Usia Mustahik
-        if (formData.usia_mustahik > 50) totalScore += 5;
-        else if (formData.usia_mustahik >= 40) totalScore += 4;
-        else if (formData.usia_mustahik >= 30) totalScore += 3;
-        else if (formData.usia_mustahik >= 20) totalScore += 2;
-        else totalScore += 1;
+        // 12. Usia Mustahik
+        if (formData.usia_mustahik > 50) {
+            totalScore += 5;
+        } else if (formData.usia_mustahik >= 40) {
+            totalScore += 4;
+        } else if (formData.usia_mustahik >= 30) {
+            totalScore += 3;
+        } else if (formData.usia_mustahik >= 20) {
+            totalScore += 2;
+        } else {
+            totalScore += 1;
+        }
 
-        // Kondisi Kepala Keluarga
+        // 13. Kondisi Kepala Keluarga
         switch (formData.kondisi_kepala_keluarga) {
             case 'sakit menahun': totalScore += 5; break;
             case 'sakit-sakitan': totalScore += 4; break;
@@ -171,7 +179,7 @@ const App = () => {
             default: break;
         }
 
-        // Kepemilikan Rumah
+        // 14. Kepemilikan Rumah
         switch (formData.kepemilikan_rumah) {
             case 'menumpang': totalScore += 5; break;
             case 'kontrak': totalScore += 4; break;
@@ -180,13 +188,18 @@ const App = () => {
             default: break;
         }
 
-        // Luas Rumah
-        if (formData.luas_rumah === 'Sangat kecil') totalScore += 5;
-        else if (formData.luas_rumah === '3×3 m') totalScore += 4;
-        else if (formData.luas_rumah === '4×6 m') totalScore += 3;
-        else totalScore += 1;
+        // 15. Luas Rumah
+        if (formData.luas_rumah === 'Sangat kecil') {
+            totalScore += 5;
+        } else if (formData.luas_rumah === '3×3 m') {
+            totalScore += 4;
+        } else if (formData.luas_rumah === '4×6 m') {
+            totalScore += 3;
+        } else {
+            totalScore += 1;
+        }
 
-        // Dinding Rumah
+        // 16. Dinding Rumah
         switch (formData.dinding_rumah) {
             case 'bambu': totalScore += 5; break;
             case 'seng': totalScore += 4; break;
@@ -196,7 +209,7 @@ const App = () => {
             default: break;
         }
 
-        // Lantai Rumah
+        // 17. Lantai Rumah
         switch (formData.lantai_rumah) {
             case 'tanah': totalScore += 5; break;
             case 'panggung': totalScore += 4; break;
@@ -205,7 +218,7 @@ const App = () => {
             default: break;
         }
 
-        // Atap Rumah
+        // 18. Atap Rumah
         switch (formData.atap_rumah) {
             case 'rumbia': totalScore += 5; break;
             case 'seng': totalScore += 4; break;
@@ -214,7 +227,7 @@ const App = () => {
             default: break;
         }
 
-        // Sumber Air
+        // 19. Sumber Air
         switch (formData.sumber_air) {
             case 'tidak ada': totalScore += 5; break;
             case 'bersama': totalScore += 4; break;
@@ -224,7 +237,7 @@ const App = () => {
             default: break;
         }
 
-        // MCK
+        // 20. MCK
         switch (formData.mck) {
             case 'tidak ada': totalScore += 5; break;
             case 'bersama': totalScore += 4; break;
@@ -232,7 +245,7 @@ const App = () => {
             default: break;
         }
 
-        // Penerangan
+        // 21. Penerangan
         switch (formData.penerangan) {
             case 'genset': totalScore += 1; break;
             case 'pln': totalScore += 2; break;
@@ -241,13 +254,18 @@ const App = () => {
             default: break;
         }
 
-        // Listrik Terpasang
-        if (formData.listrik_terpasang === '1300kwh') totalScore += 1;
-        else if (formData.listrik_terpasang === '900kwh') totalScore += 2;
-        else if (formData.listrik_terpasang === '450kwh') totalScore += 3;
-        else totalScore += 5;
+        // 22. Listrik Terpasang
+        if (formData.listrik_terpasang === '1300kwh') {
+            totalScore += 1;
+        } else if (formData.listrik_terpasang === '900kwh') {
+            totalScore += 2;
+        } else if (formData.listrik_terpasang === '450kwh') {
+            totalScore += 3;
+        } else {
+            totalScore += 5;
+        }
 
-        // Kelayakan Tidur
+        // 23. Kelayakan Tidur
         switch (formData.kelayakan_tidur) {
             case 'spring bed': totalScore += 1; break;
             case 'kasur busa': totalScore += 2; break;
@@ -256,39 +274,65 @@ const App = () => {
             default: break;
         }
 
-        // Jumlah Makan Perhari
-        if (formData.jumlah_makan_perhari === 1) totalScore += 5;
-        else if (formData.jumlah_makan_perhari === 2) totalScore += 3;
-        else totalScore += 1;
+        // 24. Jumlah Makan Perhari
+        if (formData.jumlah_makan_perhari === 1) {
+            totalScore += 5;
+        } else if (formData.jumlah_makan_perhari === 2) {
+            totalScore += 3;
+        } else {
+            totalScore += 1;
+        }
 
-        // Ayam Konsumsi
-        if (formData.ayam_konsumsi === 'tidak pernah') totalScore += 5;
-        else if (formData.ayam_konsumsi === '1 kali/pekan') totalScore += 4;
-        else totalScore += 2;
+        // 25. Ayam Konsumsi
+        if (formData.ayam_konsumsi === 'tidak pernah') {
+            totalScore += 5;
+        } else if (formData.ayam_konsumsi === '1 kali/pekan') {
+            totalScore += 4;
+        } else {
+            totalScore += 2;
+        }
 
-        // Daging Konsumsi
-        if (formData.daging_konsumsi === 'tidak pernah') totalScore += 5;
-        else if (formData.daging_konsumsi === '1 kali/pekan') totalScore += 4;
-        else totalScore += 2;
+        // 26. Daging Konsumsi
+        if (formData.daging_konsumsi === 'tidak pernah') {
+            totalScore += 5;
+        } else if (formData.daging_konsumsi === '1 kali/pekan') {
+            totalScore += 4;
+        } else {
+            totalScore += 2;
+        }
 
-        // Susu Konsumsi
-        if (formData.susu_konsumsi === 'tidak pernah') totalScore += 5;
-        else if (formData.susu_konsumsi === '1 kali/pekan') totalScore += 4;
-        else totalScore += 2;
+        // 27. Susu Konsumsi
+        if (formData.susu_konsumsi === 'tidak pernah') {
+            totalScore += 5;
+        } else if (formData.susu_konsumsi === '1 kali/pekan') {
+            totalScore += 4;
+        } else {
+            totalScore += 2;
+        }
 
-        // Belanja Harian
-        if (formData.belanja_harian > 100000) totalScore += 1;
-        else if (formData.belanja_harian >= 50000) totalScore += 2;
-        else if (formData.belanja_harian >= 25000) totalScore += 3;
-        else if (formData.belanja_harian >= 15000) totalScore += 4;
-        else totalScore += 5;
+        // 28. Belanja Harian
+        if (formData.belanja_harian > 100000) {
+            totalScore += 1;
+        } else if (formData.belanja_harian >= 50000) {
+            totalScore += 2;
+        } else if (formData.belanja_harian >= 25000) {
+            totalScore += 3;
+        } else if (formData.belanja_harian >= 15000) {
+            totalScore += 4;
+        } else {
+            totalScore += 5;
+        }
 
-        // Aset Tidak Bergerak
-        if (formData.aset_tidak_bergerak === 'tidak punya') totalScore += 5;
-        else if (formData.aset_tidak_bergerak === 'kurang dari 500m²') totalScore += 4;
-        else totalScore += 2;
+        // 29. Aset Tidak Bergerak
+        if (formData.aset_tidak_bergerak === 'tidak punya') {
+            totalScore += 5;
+        } else if (formData.aset_tidak_bergerak === 'kurang dari 500m²') {
+            totalScore += 4;
+        } else {
+            totalScore += 2;
+        }
 
-        // Aset Bergerak
+        // 30. Aset Bergerak
         switch (formData.aset_bergerak) {
             case 'mobil': totalScore += 1; break;
             case 'motor': totalScore += 2; break;
@@ -296,99 +340,151 @@ const App = () => {
             case 'tidak punya': totalScore += 5; break;
             default: break;
         }
-        // Hitung score berdasarkan status bantuan
-    switch (formData.status_bantuan) {
-        case '1': // Ya
-            totalScore += 1;
-            break;
-        case '2': // Tidak
-            totalScore += 2;
-            break;
-        default:
-            break;
-    }
 
-    // Hitung score berdasarkan jenis bantuan
-    switch (formData.jenis_bantuan) {
-        case '1': // Pemerintah
-            totalScore += 1;
-            break;
-        case '2': // Masjid
-            totalScore += 2;
-            break;
-        case '3': // Lembaga Sosial Lain
-            totalScore += 3;
-            break;
-        case '4': // Tidak Ada
-            totalScore += 4;
-            break;
-        default:
-            break;
-    }
-    switch (formData.frekuensi_bantuan) {
-        case '1': // Bulanan
-            totalScore += 1;
-            break;
-        case '2': // Triwulan
-            totalScore += 2;
-            break;
-        case '3': // 6 Bulan
-            totalScore += 3;
-            break;
-        case '4': // 1 Tahun
-            totalScore += 4;
-            break;
-        case '5': // Tidak Pernah
-            totalScore += 5;
-            break;
-        default:
-            break;
-    }
+        // 31. Status Bantuan
+        switch (formData.status_bantuan) {
+            case '1': // Ya
+                totalScore += 1;
+                break;
+            case '2': // Tidak
+                totalScore += 2;
+                break;
+            default:
+                break;
+        }
 
-        // Update formData dengan total_score yang telah dihitung
-        setFormData({ ...formData, total_score: totalScore });
+        // 32. Jenis Bantuan
+        switch (formData.jenis_bantuan) {
+            case '1': // Pemerintah
+                totalScore += 1;
+                break;
+            case '2': // Masjid
+                totalScore += 2;
+                break;
+            case '3': // Lembaga Sosial Lain
+                totalScore += 3;
+                break;
+            case '4': // Tidak Ada
+                totalScore += 4;
+                break;
+            default:
+                break;
+        }
+
+        // 33. Frekuensi Bantuan
+        switch (formData.frekuensi_bantuan) {
+            case '1': // Bulanan
+                totalScore += 1;
+                break;
+            case '2': // Triwulan
+                totalScore += 2;
+                break;
+            case '3': // 6 Bulan
+                totalScore += 3;
+                break;
+            case '4': // 1 Tahun
+                totalScore += 4;
+                break;
+            case '5': // Tidak Pernah
+                totalScore += 5;
+                break;
+            default:
+                break;
+        }
+
+        return totalScore;
     };
+
+    // Menghitung total_score setiap kali formData berubah menggunakan useMemo
+    const totalScore = useMemo(() => calculateTotalScore(), [formData]);
 
     // Fungsi untuk menangani perubahan input
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: name === 'riwayat_hutang' ? value === 'true' : value // Convert string to boolean
-        });
+        const { name, value, type, checked } = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: type === 'checkbox' ? checked : value
+        }));
     };
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Pengecekan manual apakah semua field sudah terisi
-    const emptyFields = Object.keys(formData).filter(key => formData[key] === '' || formData[key] === 0);
-    
-    if (emptyFields.length > 0) {
-        alert(`Please fill out the following fields: ${emptyFields.join(', ')}`);
-        return;
-    }
-        calculateTotalScore();
-        
-        setTimeout(async () => {
-        // Insert data ke Supabase
-        const { error } = await supabase
-            .from('mustahik_data')
-            .insert([formData]);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Pengecekan manual apakah semua field sudah terisi
+        const emptyFields = Object.keys(formData).filter(key => {
+            if (key === 'riwayat_hutang') return false; // Kecuali riwayat_hutang
+            if (typeof formData[key] === 'number') return formData[key] === 0;
+            return formData[key] === '';
+        });
+
+        if (emptyFields.length > 0) {
+            alert(`Please fill out the following fields: ${emptyFields.join(', ')}`);
+            return;
+        }
+
+        // Menambahkan total_score ke data yang akan dikirim
+        const dataToSubmit = { ...formData, totalScore };
+
+        try {
+            // Insert data ke Supabase
+            const { error } = await supabase
+                .from('mustahik_data')
+                .insert([dataToSubmit]);
 
             if (error) {
                 console.error('Error submitting survey:', error);
                 alert('Error submitting survey, please try again!');
             } else {
                 alert('Survey submitted successfully!');
-                // Reset form setelah submit, reset total_score juga
+                // Reset form setelah submit
                 setFormData({
-                    ...formData,
-                    total_score: ''// Reset total_score ke nilai awal
+                    tanggal_survey: '',
+                    petugas_survey: 'Admin',
+                    nama_mustahik: '',
+                    bantuan_diajukan: '', 
+                    jumlah_tanggungan: 0,
+                    jumlah_anak_sekolah: 0,
+                    jumlah_anak_putus_sekolah: 0,
+                    pengeluaran_bulanan: 0,
+                    obat_rutin: 0,
+                    biaya_pendidikan: 0,
+                    riwayat_hutang: false,
+                    keperluan_hutang: '',
+                    pekerjaan_kepala_keluarga: '',
+                    pekerjaan_suami_istri: '',
+                    usia_mustahik: 0,
+                    kondisi_kepala_keluarga: '',
+                    kepemilikan_rumah: '',
+                    luas_rumah: '',
+                    dinding_rumah: '',
+                    lantai_rumah: '',
+                    atap_rumah: '',
+                    sumber_air: '',
+                    mck: '',
+                    penerangan: '',
+                    listrik_terpasang: '',
+                    kelayakan_tidur: '',
+                    jumlah_makan_perhari: 0,
+                    ayam_konsumsi: '',
+                    daging_konsumsi: '',
+                    susu_konsumsi: '',
+                    belanja_harian: 0,
+                    aset_tidak_bergerak: '',
+                    aset_bergerak: '',
+                    status_bantuan: '',
+                    jenis_bantuan: '',
+                    frekuensi_bantuan: '',
+                    bantuan_yang_diterima: '',
+                    rencana_tindak_lanjut: '',
                 });
             }
-        }, 1);  // Delay kecil untuk memastikan total_score sudah diperbarui
+        } catch (error) {
+            console.error('Unexpected error:', error);
+            alert('An unexpected error occurred, please try again!');
+        }
     };
+    
+
     return (
         <div className="app-container">
         <img src={bgImage} alt="Descriptive Alt Text" className="header-image" />
