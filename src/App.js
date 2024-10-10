@@ -30,10 +30,6 @@ const App = () => {
         penerangan: '',
         listrik_terpasang: '',
         kelayakan_tidur: '',
-        jumlah_makan_perhari: 0,
-        ayam_konsumsi: '',
-        daging_konsumsi: '',
-        susu_konsumsi: '',
         belanja_harian: 0,
         aset_tidak_bergerak: '',
         aset_bergerak: '',
@@ -273,43 +269,6 @@ const App = () => {
             case 'tikar/karpet': totalScore += 5; break;
             default: break;
         }
-
-        // 24. Jumlah Makan Perhari
-        if (formData.jumlah_makan_perhari === 1) {
-            totalScore += 5;
-        } else if (formData.jumlah_makan_perhari === 2) {
-            totalScore += 3;
-        } else {
-            totalScore += 1;
-        }
-
-        // 25. Ayam Konsumsi
-        if (formData.ayam_konsumsi === 'tidak pernah') {
-            totalScore += 5;
-        } else if (formData.ayam_konsumsi === '1 kali/pekan') {
-            totalScore += 4;
-        } else {
-            totalScore += 2;
-        }
-
-        // 26. Daging Konsumsi
-        if (formData.daging_konsumsi === 'tidak pernah') {
-            totalScore += 5;
-        } else if (formData.daging_konsumsi === '1 kali/pekan') {
-            totalScore += 4;
-        } else {
-            totalScore += 2;
-        }
-
-        // 27. Susu Konsumsi
-        if (formData.susu_konsumsi === 'tidak pernah') {
-            totalScore += 5;
-        } else if (formData.susu_konsumsi === '1 kali/pekan') {
-            totalScore += 4;
-        } else {
-            totalScore += 2;
-        }
-
         // 28. Belanja Harian
         if (formData.belanja_harian > 100000) {
             totalScore += 1;
@@ -464,10 +423,6 @@ const App = () => {
                     penerangan: '',
                     listrik_terpasang: '',
                     kelayakan_tidur: '',
-                    jumlah_makan_perhari: 0,
-                    ayam_konsumsi: '',
-                    daging_konsumsi: '',
-                    susu_konsumsi: '',
                     belanja_harian: 0,
                     aset_tidak_bergerak: '',
                     aset_bergerak: '',
@@ -710,43 +665,6 @@ const App = () => {
                 <option value="matras">Kasur Kapuk</option>
                 <option value="lantai">Tikar/karpet</option>
             </select>
-
-            <label>Jumlah Makan per Hari:</label>
-            <select name="jumlah_makan_perhari" onChange={handleChange} required>
-                <option value="">Pilih jumlah makan</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>
-
-            <label>Ayam Konsumsi:</label>
-            <select name="ayam_konsumsi" onChange={handleChange} required>
-                <option value="">Pilih frekuensi ayam konsumsi</option>
-                <option value="tidak pernah">Tidak Pernah</option>
-                <option value="sebulan sekali">Sebulan Sekali</option>
-                <option value="seminggu sekali">Seminggu Sekali</option>
-                <option value="setiap hari">Setiap Hari</option>
-            </select>
-
-            <label>Daging Konsumsi:</label>
-            <select name="daging_konsumsi" onChange={handleChange} required>
-                <option value="">Pilih frekuensi daging konsumsi</option>
-                <option value="tidak pernah">Tidak Pernah</option>
-                <option value="sebulan sekali">Sebulan Sekali</option>
-                <option value="seminggu sekali">Seminggu Sekali</option>
-                <option value="setiap hari">Setiap Hari</option>
-            </select>
-
-            <label>Susu Konsumsi:</label>
-            <select name="susu_konsumsi" onChange={handleChange} required>
-                <option value="">Pilih frekuensi susu konsumsi</option>
-                <option value="tidak pernah">Tidak Pernah</option>
-                <option value="sebulan sekali">Sebulan Sekali</option>
-                <option value="seminggu sekali">Seminggu Sekali</option>
-                <option value="setiap hari">Setiap Hari</option>
-            </select>
-
             <label>Belanja Harian:</label>
             <select name="belanja_harian" onChange={handleChange} required>
                 <option value="">Pilih belanja harian</option>
