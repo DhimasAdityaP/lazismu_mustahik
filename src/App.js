@@ -35,8 +35,13 @@ const App = () => {
         mck: '',
         penerangan: '',
         kelayakan_tidur: '',
-        aset_tidak_bergerak: '', // New field
-        aset_bergerak: '',        // New field
+        jumlah_makan_perhari: 0,
+        ayam_konsumsi: '',
+        daging_konsumsi: '',
+        susu_konsumsi: '',
+        belanja_harian: 0,
+        aset_tidak_bergerak: '',
+        aset_bergerak: '',
         status_bantuan: '',
         jenis_bantuan: '',
         frekuensi_bantuan: '',
@@ -288,20 +293,56 @@ const App = () => {
             default: break;
         }
 
-        // 23. Biaya Perbulan (Combined Fields)
-        // Assuming that 'biaya_perbulan' holds the sum of obat_rutin, biaya_pendidikan, hutang, listrik, belanja_harian points
-        // This depends on how you want to interpret "biaya_perbulan"
-        // For this example, we'll assume it's directly the point value selected
-        totalScore += parseInt(formData.biaya_perbulan) || 0;
+        // 24. Jumlah Makan Perhari
+        if (formData.jumlah_makan_perhari === 1) {
+            totalScore += 5;
+        } else if (formData.jumlah_makan_perhari === 2) {
+            totalScore += 3;
+        } else {
+            totalScore += 1;
+        }
 
-        // 24. Pengeluaran Lainnya
-        const { wifi, kuota, bensin, lainnya } = formData.pengeluaran_lainnya;
-        if (wifi > 0) totalScore += 1; // Assign points as per your criteria
-        if (kuota > 0) totalScore += 1;
-        if (bensin > 0) totalScore += 1;
-        if (lainnya.trim() !== '') totalScore += 1;
+        // 25. Ayam Konsumsi
+        if (formData.ayam_konsumsi === 'tidak pernah') {
+            totalScore += 5;
+        } else if (formData.ayam_konsumsi === '1 kali/pekan') {
+            totalScore += 4;
+        } else {
+            totalScore += 2;
+        }
 
-        // 25. Aset Tidak Bergerak
+        // 26. Daging Konsumsi
+        if (formData.daging_konsumsi === 'tidak pernah') {
+            totalScore += 5;
+        } else if (formData.daging_konsumsi === '1 kali/pekan') {
+            totalScore += 4;
+        } else {
+            totalScore += 2;
+        }
+
+        // 27. Susu Konsumsi
+        if (formData.susu_konsumsi === 'tidak pernah') {
+            totalScore += 5;
+        } else if (formData.susu_konsumsi === '1 kali/pekan') {
+            totalScore += 4;
+        } else {
+            totalScore += 2;
+        }
+
+        // 28. Belanja Harian
+        if (formData.belanja_harian > 100000) {
+            totalScore += 1;
+        } else if (formData.belanja_harian >= 50000) {
+            totalScore += 2;
+        } else if (formData.belanja_harian >= 25000) {
+            totalScore += 3;
+        } else if (formData.belanja_harian >= 15000) {
+            totalScore += 4;
+        } else {
+            totalScore += 5;
+        }
+
+        // 29. Aset Tidak Bergerak
         if (formData.aset_tidak_bergerak === 'tidak punya') {
             totalScore += 5;
         } else if (formData.aset_tidak_bergerak === 'kurang dari 500m²') {
@@ -470,6 +511,11 @@ const App = () => {
                     mck: '',
                     penerangan: '',
                     kelayakan_tidur: '',
+                    jumlah_makan_perhari: 0,
+                    ayam_konsumsi: '',
+                    daging_konsumsi: '',
+                    susu_konsumsi: '',
+                    belanja_harian: 0,
                     aset_tidak_bergerak: '',
                     aset_bergerak: '',
                     status_bantuan: '',
