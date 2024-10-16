@@ -35,8 +35,8 @@ const App = () => {
         mck: '',
         penerangan: '',
         kelayakan_tidur: '',
-        aset_tidak_bergerak: '',
-        aset_bergerak: '',
+        aset_tidak_bergerak: '', // New field
+        aset_bergerak: '',        // New field
         status_bantuan: '',
         jenis_bantuan: '',
         frekuensi_bantuan: '',
@@ -288,7 +288,20 @@ const App = () => {
             default: break;
         }
 
-        // 29. Aset Tidak Bergerak
+        // 23. Biaya Perbulan (Combined Fields)
+        // Assuming that 'biaya_perbulan' holds the sum of obat_rutin, biaya_pendidikan, hutang, listrik, belanja_harian points
+        // This depends on how you want to interpret "biaya_perbulan"
+        // For this example, we'll assume it's directly the point value selected
+        totalScore += parseInt(formData.biaya_perbulan) || 0;
+
+        // 24. Pengeluaran Lainnya
+        const { wifi, kuota, bensin, lainnya } = formData.pengeluaran_lainnya;
+        if (wifi > 0) totalScore += 1; // Assign points as per your criteria
+        if (kuota > 0) totalScore += 1;
+        if (bensin > 0) totalScore += 1;
+        if (lainnya.trim() !== '') totalScore += 1;
+
+        // 25. Aset Tidak Bergerak
         if (formData.aset_tidak_bergerak === 'tidak punya') {
             totalScore += 5;
         } else if (formData.aset_tidak_bergerak === 'kurang dari 500m²') {
@@ -386,39 +399,32 @@ const App = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         // Manual check for empty fields
         const emptyFields = Object.keys(formData).filter(key => {
             if (key === 'pengeluaran_lainnya') {
                 const subFields = Object.keys(formData[key]);
-                return subFields.some(subKey => formData[key][subKey] === '' || subKey !== 'lainnya' && formData[key][subKey] === 0);
+                return subFields.some(subKey => formData[key][subKey] === '' || formData[key][subKey] === 0);
             }
             if (key === 'riwayat_hutang') return false; // Optional
-            if (typeof formData[key] === 'number') {
-                // Tentukan bidang mana yang harus tidak 0, atau abaikan jika 0 diperbolehkan
-                // Misalnya, jika 'jumlah_tanggungan' bisa 0:
-                if (['jumlah_tanggungan', 'jumlah_anak_sekolah', 'jumlah_anak_putus_sekolah', 'usia_mustahik'].includes(key)) {
-                    return false; // Tidak dianggap kosong meskipun 0
-                }
-                return formData[key] === 0;
-            }
+            if (typeof formData[key] === 'number') return formData[key] === 0;
             return formData[key] === '';
         });
-    
+
         if (emptyFields.length > 0) {
             alert(`Please fill out the following fields: ${emptyFields.join(', ')}`);
             return;
         }
-    
+
         // Prepare data to submit, including totalScore
         const dataToSubmit = { ...formData, totalScore };
-    
+
         try {
             // Insert data into Supabase
             const { error } = await supabase
                 .from('mustahik_data')
                 .insert([dataToSubmit]);
-    
+
             if (error) {
                 console.error('Error submitting survey:', error);
                 alert('Error submitting survey, please try again!');
@@ -471,7 +477,6 @@ const App = () => {
             alert('An unexpected error occurred, please try again!');
         }
     };
-    
 
     return (
         <div className="app-container">
@@ -858,79 +863,34 @@ const App = () => {
                     <option value="sentir/lilin">Sentir/Lilin</option>
                 </select>
 
-            <label>Listrik Terpasang:</label>
-            <select name="listrik_terpasang" onChange={handleChange} required>
-                <option value="">Pilih status listrik</option>
-                <option value="tidak terpasang">1.300kwh</option>
-                <option value="tidak terpasang">900kwh</option>
-                <option value="tidak terpasang">450kwh</option>
-                <option value="terpasang">Tidak ada</option>
-            </select>
+                {/* Kelayakan Tidur */}
+                <label>Kelayakan Tidur:</label>
+                <select
+                    name="kelayakan_tidur"
+                    value={formData.kelayakan_tidur}
+                    onChange={handleChange}
+                    required
+                >
+                    <option value="">Pilih kelayakan tidur</option>
+                    <option value="spring bed">Spring Bed</option>
+                    <option value="kasur busa">Kasur Busa</option>
+                    <option value="kasur kapuk">Kasur Kapuk</option>
+                    <option value="tikar/karpet">Tikar/Karpet</option>
+                </select>
 
-            <label>Kelayakan Tidur:</label>
-            <select name="kelayakan_tidur" onChange={handleChange} required>
-                <option value="">Pilih kelayakan tidur</option>
-                <option value="spring bed">Spring Bed</option>
-                <option value="matras">Kasur Busa</option>
-                <option value="matras">Kasur Kapuk</option>
-                <option value="lantai">Tikar/karpet</option>
-            </select>
-
-            <label>Jumlah Makan per Hari:</label>
-            <select name="jumlah_makan_perhari" onChange={handleChange} required>
-                <option value="">Pilih jumlah makan</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>
-
-            <label>Ayam Konsumsi:</label>
-            <select name="ayam_konsumsi" onChange={handleChange} required>
-                <option value="">Pilih frekuensi ayam konsumsi</option>
-                <option value="tidak pernah">Tidak Pernah</option>
-                <option value="sebulan sekali">Sebulan Sekali</option>
-                <option value="seminggu sekali">Seminggu Sekali</option>
-                <option value="setiap hari">Setiap Hari</option>
-            </select>
-
-            <label>Daging Konsumsi:</label>
-            <select name="daging_konsumsi" onChange={handleChange} required>
-                <option value="">Pilih frekuensi daging konsumsi</option>
-                <option value="tidak pernah">Tidak Pernah</option>
-                <option value="sebulan sekali">Sebulan Sekali</option>
-                <option value="seminggu sekali">Seminggu Sekali</option>
-                <option value="setiap hari">Setiap Hari</option>
-            </select>
-
-            <label>Susu Konsumsi:</label>
-            <select name="susu_konsumsi" onChange={handleChange} required>
-                <option value="">Pilih frekuensi susu konsumsi</option>
-                <option value="tidak pernah">Tidak Pernah</option>
-                <option value="sebulan sekali">Sebulan Sekali</option>
-                <option value="seminggu sekali">Seminggu Sekali</option>
-                <option value="setiap hari">Setiap Hari</option>
-            </select>
-
-            <label>Belanja Harian:</label>
-            <select name="belanja_harian" onChange={handleChange} required>
-                <option value="">Pilih belanja harian</option>
-                <option value="0">0</option>
-                <option value="50000">lebih dari 100.000</option>
-                <option value="100000">50.000-100.000</option>
-                <option value="200000">50.000-100.000</option>
-                <option value="300000">25.000-50.000</option>
-                <option value="400000">15.000-25.000</option>
-                <option value="500000">1.000-15.000</option>
-            </select>
-
-            <label>Aset Tidak Bergerak:</label>
-            <select name="aset_tidak_bergerak" onChange={handleChange} required>
-                <option value="">Pilih aset tidak bergerak</option>
-                <option value="tidak punya">Tidak Punya</option>
-                <option value="ada">500m2-750m2</option>
-                <option value="ada">lebih dari atau sama dengan 500m2</option>
-            </select>
+                {/* Aset Tidak Bergerak */}
+                <label>Aset Tidak Bergerak:</label>
+                <select
+                    name="aset_tidak_bergerak"
+                    value={formData.aset_tidak_bergerak}
+                    onChange={handleChange}
+                    required
+                >
+                    <option value="">Pilih aset tidak bergerak</option>
+                    <option value="tidak punya">Tidak Punya</option>
+                    <option value="kurang dari 500m²">Kurang dari 500m²</option>
+                    <option value="lebih dari 500m²">Lebih dari 500m²</option>
+                </select>
 
                 {/* Aset Bergerak */}
                 <label>Aset Bergerak:</label>
