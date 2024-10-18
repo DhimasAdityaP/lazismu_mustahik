@@ -669,17 +669,6 @@ const App = () => {
                         required
                     />
 
-                    <label>Pengeluaran Lainnya:</label>
-                    <input
-                        type="text"
-                        name="pengeluaran_lainnya.lainnya"
-                        value={formData.pengeluaran_lainnya.lainnya}
-                        onChange={handleChange}
-                        placeholder="Pengeluaran lainnya"
-                        required
-                    />
-                </div>
-
                 {/* Pekerjaan Kepala Keluarga */}
                 <label>Pekerjaan Kepala Keluarga:</label>
                 <select
